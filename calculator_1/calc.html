@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculator</title>
+    <style>
+      button {
+        width: 50px;
+        height: 50px;
+        margin: 5px;
+      }
+
+      #display {
+        width: 500px;
+        height: 60px;
+        margin: 20px;
+        border: 2px solid #444;
+        padding: 10px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 40px;
+        font-weight: bold;
+      }
+
+      #history {
+        width: 500px;
+        height: 160px;
+        margin: 20px;
+        padding: 10px;
+        font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+        font-size: 22px;
+        font-weight: bold;
+        height: 100px; /* Ustawiona wysokość kontenera historii */
+        overflow-y: auto; /* Dodanie pionowego przewijania */
+        border: 1px solid #ccc;
+        margin-top: 10px;
+      }
+    </style>
+    <script>
+      function gen() {
+        const main = document.getElementById("main");
+
+        keyboard_numbers = document.createElement("div");
+        keyboard_operators = document.createElement("div");
+
+        const display = document.createElement("div");
+        const history = document.createElement("div");
+
+        main.appendChild(keyboard_numbers);
+        main.appendChild(keyboard_operators);
+        display.id = "display";
+        main.appendChild(display);
+        history.id = "history";
+        main.appendChild(history);
+
+        for (let i = 1; i <= 10; i++) {
+          if (i == 10) i = 0; // chce zeby 0 bylo na koncu :)
+          const key = document.createElement("button");
+          key.innerText = i;
+          key.onclick = addToDisplay;
+          key.dataset.value = i;
+          keyboard_numbers.appendChild(key);
+          if (i == 0) break;
+        }
+
+        const operators = ["+", "-", "*", "/"];
+        for (const operator of operators) {
+          const key = document.createElement("button");
+          key.innerText = operator;
+          key.onclick = addToDisplay;
+          key.dataset.value = operator;
+          keyboard_operators.appendChild(key);
+        }
+
+        const specialKeys = ["=", "."];
+        for (const specialKey of specialKeys) {
+          const key = document.createElement("button");
+          key.innerText = specialKey;
+          key.onclick = handleSpecialKey;
+          key.dataset.value = specialKey;
+          keyboard_operators.appendChild(key);
+        }
+
+        const backspaceKey = document.createElement("button");
+        backspaceKey.innerText = "C";
+        backspaceKey.onclick = backspace;
+        keyboard_operators.appendChild(backspaceKey);
+
+        const clearKey = document.createElement("button");
+        clearKey.innerText = "AC";
+        clearKey.onclick = clearDisplay;
+        keyboard_operators.appendChild(clearKey);
+      }
+
+      function addToDisplay() {
+        const display = document.getElementById("display");
+        const history = document.getElementById("history");
+
+        display.innerText += this.dataset.value;
+      }
+
+      function handleSpecialKey() {
+        const display = document.getElementById("display");
+        const history = document.getElementById("history");
+
+        if (this.dataset.value === "=") {
+          try {
+            eval_val = eval(display.innerText);
+            history.innerText =
+              display.innerText + "=" + eval_val + "\n" + history.innerText;
+            display.innerText = eval(display.innerText);
+          } catch (error) {
+            display.innerText = "Error";
+          }
+        } else if (this.dataset.value === ".") {
+          if (!display.innerText.includes(".")) {
+            display.innerText += this.dataset.value; // trochę głupie, ale dopuszczamy tylko jedna liczbe z przecinkiem
+          }
+        }
+      }
+
+      function backspace() {
+        const display = document.getElementById("display");
+        display.innerText = display.innerText.slice(0, -1); // wycinamy ostatni znak
+      }
+
+      function clearDisplay() {
+        const display = document.getElementById("display");
+
+        display.innerText = "";
+      }
+    </script>
+  </head>
+  <body onload="gen()">
+    <div id="main"></div>
+  </body>
+</html>
